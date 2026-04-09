@@ -1,0 +1,7 @@
+node_modules/
+bostique.db*
+*.log
+.vercel/
+.DS_Store
+.env
+test.db
