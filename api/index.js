@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 
 const DB_FILE = '/tmp/bostique.json';
 
@@ -21,10 +20,10 @@ function loadDB() {
       {id:8,name:'Tan Leather Cushion Pair',category:'Cushion Cover',category_id:4,price:1699,emoji:'🪑',desc:'Set of 2 cushion covers.',badge:'Sale',image:'',status:'active'}
     ],
     categories: [
-      {id:1,name:'Duffel Bag',icon:'🧳',productCount:2},
-      {id:2,name:'Carry Bag',icon:'👜',productCount:2},
-      {id:3,name:'Backpack',icon:'🎒',productCount:2},
-      {id:4,name:'Cushion Cover',icon:'🛋️',productCount:2}
+      {id:1,name:'Duffel Bag',icon:'🧳'},
+      {id:2,name:'Carry Bag',icon:'👜'},
+      {id:3,name:'Backpack',icon:'🎒'},
+      {id:4,name:'Cushion Cover',icon:'🛋️'}
     ],
     users: [],
     discounts: [],
@@ -44,18 +43,15 @@ module.exports = (req, res) => {
   const db = loadDB();
   const { method, url } = req;
 
-  // Set CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (method === 'OPTIONS') return res.status(200).end();
 
-  // Categories
   if (url === '/api/categories') {
     return res.json(db.categories.map(c => ({...c, productCount: db.products.filter(p => p.category_id === c.id && p.status === 'active').length})));
   }
 
-  // Products
   if (url === '/api/products') {
     return res.json(db.products.map(p => {
       const cat = db.categories.find(c => c.id === p.category_id);
@@ -63,7 +59,6 @@ module.exports = (req, res) => {
     }));
   }
 
-  // Stats
   if (url === '/api/stats') {
     return res.json({
       products: db.products.filter(p => p.status === 'active').length,
@@ -74,12 +69,10 @@ module.exports = (req, res) => {
     });
   }
 
-  // Users (admin)
   if (url === '/api/users') {
     return res.json(db.users.map(u => ({...u, created_at: new Date().toISOString()})));
   }
 
-  // Register
   if (method === 'POST' && url === '/api/register') {
     let body = '';
     req.on('data', chunk => body += chunk);
@@ -96,7 +89,6 @@ module.exports = (req, res) => {
     return;
   }
 
-  // Login
   if (method === 'POST' && url === '/api/login') {
     let body = '';
     req.on('data', chunk => body += chunk);
@@ -109,7 +101,6 @@ module.exports = (req, res) => {
     return;
   }
 
-  // Add Product
   if (method === 'POST' && url === '/api/products') {
     let body = '';
     req.on('data', chunk => body += chunk);
@@ -123,7 +114,6 @@ module.exports = (req, res) => {
     return;
   }
 
-  // Update Product
   if (method === 'PUT' && url.startsWith('/api/products/')) {
     const id = parseInt(url.split('/').pop());
     let body = '';
@@ -140,7 +130,6 @@ module.exports = (req, res) => {
     return;
   }
 
-  // Delete Product
   if (method === 'DELETE' && url.startsWith('/api/products/')) {
     const id = parseInt(url.split('/').pop());
     db.products = db.products.filter(p => p.id !== id);
